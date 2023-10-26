@@ -15,6 +15,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
+import FacebookLogin from "react-facebook-login";
 
 const defaultTheme = createTheme();
 
@@ -66,6 +67,21 @@ export default function Signup2() {
             window.alert("User Already Exists.Please Login");
         });
     }
+  };
+  const responseFacebook = (response) => {
+    // Handle the response from Facebook here
+    API.post("/users/signup", {
+      facebookAccessToken: response.accessToken,
+    })
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem("username", res.data.result.firstName);
+        navigate("/");
+      })
+      .catch((err) => {
+        if (err.response.status == 400)
+          window.alert("User Already Exists.Please Login");
+      });
   };
 
   return (
@@ -148,6 +164,12 @@ export default function Signup2() {
           <button onClick={() => login()} className={LoginStyles.googleBTN}>
             <i className="fa-brands fa-google"></i> Sign Up with google
           </button>
+          <FacebookLogin
+            appId="app-id"
+            autoLoad={false}
+            fields="name,email,picture"
+            callback={responseFacebook}
+          />
           <Grid container justifyContent="flex-end">
             <Grid item>
               <Link href="login" variant="body2">
